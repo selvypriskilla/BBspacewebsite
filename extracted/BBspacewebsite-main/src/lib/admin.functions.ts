@@ -99,8 +99,9 @@ export async function adminListSessions(
     limit?: number;
   } = {},
 ) {
-  // For SPA mode, we need admin auth
   const { userId } = await requireSupabaseAuth();
+  await requireAdminAccess(userId);
+
   let q = supabaseAdmin
     .from("user_sessions")
     .select(
@@ -115,8 +116,9 @@ export async function adminListSessions(
 }
 
 export async function adminRevokeSession(data: { session_id: string }) {
-  // For SPA mode, we need admin auth
   const { userId } = await requireSupabaseAuth();
+  await requireAdminAccess(userId);
+
   const { error } = await supabaseAdmin
     .from("user_sessions")
     .update({ is_active: false, ended_at: new Date().toISOString() })
@@ -133,6 +135,8 @@ export async function adminListAiUsageLogs(
   data: { limit?: number; user_id?: string; since?: string } = {},
 ) {
   const { userId } = await requireSupabaseAuth();
+  await requireAdminAccess(userId);
+
   let q = supabaseAdmin
     .from("ai_usage_logs")
     .select(
@@ -149,6 +153,8 @@ export async function adminListAiUsageLogs(
 
 export async function adminAiUsageSummary(data: { days?: number } = {}) {
   const { userId } = await requireSupabaseAuth();
+  await requireAdminAccess(userId);
+
   const days = data.days ?? 30;
   const since = new Date();
   since.setUTCDate(since.getUTCDate() - days);
@@ -182,8 +188,9 @@ export async function adminAiUsageSummary(data: { days?: number } = {}) {
 // SYSTEM SETTINGS
 // ============================================
 export async function adminListSystemSettings() {
-  // For SPA mode, we need admin auth
   const { userId } = await requireSupabaseAuth();
+  await requireAdminAccess(userId);
+
   const { data: rows, error } = await supabaseAdmin
     .from("system_settings")
     .select("key, value, updated_at")
@@ -194,6 +201,8 @@ export async function adminListSystemSettings() {
 
 export async function adminUpdateSystemSetting(data: { key: string; value: Json }) {
   const { userId } = await requireSupabaseAuth();
+  await requireAdminAccess(userId);
+
   const { error } = await supabaseAdmin.from("system_settings").upsert(
     {
       key: data.key,
@@ -211,6 +220,9 @@ export async function adminUpdateSystemSetting(data: { key: string; value: Json 
 // SMF / Reksadana scraping (pasardana.id)
 // ============================================
 export async function adminGetMutualFundNav(data: { fund_id?: string } = {}) {
+  const { userId } = await requireSupabaseAuth();
+  await requireAdminAccess(userId);
+
   // Pasardana exposes a public chart JSON endpoint
   const url = `https://pasardana.id/api/Fund/GetFundNavData?id=${data.fund_id || "2057"}&period=1Y`;
   try {

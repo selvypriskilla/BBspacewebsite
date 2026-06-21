@@ -77,7 +77,7 @@ export const priceAlertSchema = z.object({
     .string()
     .min(1)
     .max(10)
-    .regex(/^[A-Z]{1,5}$/, "Invalid ticker")
+    .regex(/^[A-Z0-9]{1,5}$/, "Invalid ticker")
     .transform((s) => s.toUpperCase()),
   condition: z.enum(["above", "below"]),
   threshold: z
