@@ -1,0 +1,57 @@
+{
+  "$schema": "node_modules/wrangler/config-schema.json",
+  "name": "bb-space-website",
+  "compatibility_date": "2025-09-24",
+  "compatibility_flags": ["nodejs_compat"],
+  "main": "@tanstack/react-start/server-entry",
+  "kv_namespaces": [
+    {
+      "binding": "RATE_LIMIT_KV",
+      "id": "RATE_LIMIT_NAMESPACE_ID",
+      "preview_id": "RATE_LIMIT_PREVIEW_ID",
+    },
+  ],
+  "triggers": {
+    "crons": ["30 9 * * 1-5"],
+  },
+  "env": {
+    "staging": {
+      "name": "bb-space-website-staging",
+      "vars": {
+        "ENVIRONMENT": "staging",
+      },
+      "kv_namespaces": [
+        {
+          "binding": "RATE_LIMIT_KV",
+          "id": "RATE_LIMIT_NAMESPACE_STAGING_ID",
+          "preview_id": "RATE_LIMIT_PREVIEW_ID",
+        },
+      ],
+      "routes": [
+        {
+          "pattern": "staging.kbai.id/*",
+          "zone_name": "kbai.id",
+        },
+      ],
+    },
+    "production": {
+      "name": "bb-space-website-production",
+      "vars": {
+        "ENVIRONMENT": "production",
+      },
+      "kv_namespaces": [
+        {
+          "binding": "RATE_LIMIT_KV",
+          "id": "RATE_LIMIT_NAMESPACE_PROD_ID",
+          "preview_id": "RATE_LIMIT_PREVIEW_ID",
+        },
+      ],
+      "routes": [
+        {
+          "pattern": "app.kbai.id/*",
+          "zone_name": "kbai.id",
+        },
+      ],
+    },
+  },
+}
